@@ -139,18 +139,17 @@ class CSVGenerator:
             process_time=process_time,
         )
 
+    def __str__(self):
+        """
+        Return a string representation of the CSVGenerator instance.
 
-def __str__(self):
-    """
-    Return a string representation of the CSVGenerator instance.
-
-    Returns:
-        str: A string representation of the class instance, showing key attributes.
-    """
-    return (
-        f"CSVGenerator(\n"
-        f"\tprompt={self.prompt},\n"
-        f"\tsrc_path={self.src_path},\n"
-        f"\tdst_path={self.dst_path},\n"
-        f")"
-    )
+        Returns:
+            str: A string representation of the class instance, showing key attributes.
+        """
+        return (
+            f"CSVGenerator(\n"
+            f"\tprompt={self.prompt},\n"
+            f"\tsrc_path={self.src_path},\n"
+            f"\tdst_path={self.dst_path},\n"
+            f")"
+        )

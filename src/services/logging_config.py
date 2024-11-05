@@ -32,7 +32,7 @@ def setup_logger(logger_name, use_simple_formatter=False):
     Set up a logger instance with the specified name using the configured ColoredFormatter and
     writes all logs to a file.
 
-    Args:
+    Attributes:
         logger_name (str): The name of the logger instance.
         use_simple_formatter (bool): Whether to use the simple formatter for console output.
 
