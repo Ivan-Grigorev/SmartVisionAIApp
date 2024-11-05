@@ -1,6 +1,7 @@
 """Main script to execute the image description and metadata generation project."""
 
 import threading
+import time
 import tkinter as tk
 from tkinter import filedialog, font, messagebox
 
@@ -105,7 +106,7 @@ class SmartVisionAIApp:
         """
         window = tk.Toplevel(self.root)  # Create a new top-level window
         window.title(title)
-        window.geometry("700x500")
+        window.geometry("700x600")
 
         # Labels and entries for title and description
         tk.Label(window, text=title, font=self.bold_font).pack(pady=10)
@@ -117,10 +118,14 @@ class SmartVisionAIApp:
             justify="center",
         ).pack(pady=10)
 
-        # Entry for prompt input
-        self.prompt_entry = tk.Entry(window, width=40)
-        tk.Label(window, text="Prompt (required)", font=self.default_font).pack(pady=(10, 0))
-        self.prompt_entry.pack(pady=5)
+        # Entry for prompt input with scrollable Text widget
+        self.prompt_entry = tk.Text(window, width=45, height=8, wrap="word")
+        tk.Label(window, text="Prompt", font=self.default_font).pack(pady=(10, 0))
+        self.prompt_entry.pack(pady=10)
+
+        # Scrollbar for the Text widget
+        scrollbar = tk.Scrollbar(window, command=self.prompt_entry.yview)
+        self.prompt_entry.config(yscrollcommand=scrollbar.set)
 
         # Folder selection buttons for source and destination
         self.src_folder_path = tk.StringVar()
@@ -130,7 +135,7 @@ class SmartVisionAIApp:
             font=self.default_font,
             command=self.select_src_folder,
             width=25,
-        ).pack(pady=5)
+        ).pack(pady=10)
         tk.Label(window, textvariable=self.src_folder_path, fg='white').pack()
 
         self.dst_folder_path = tk.StringVar()
@@ -140,7 +145,7 @@ class SmartVisionAIApp:
             font=self.default_font,
             command=self.select_dst_folder,
             width=25,
-        ).pack(pady=5)
+        ).pack(pady=10)
         tk.Label(window, textvariable=self.dst_folder_path, fg='white').pack()
 
         # If author name is required, create an entry for it
@@ -182,7 +187,7 @@ class SmartVisionAIApp:
         Attributes:
             run_callback (callable): The function to run for processing.
         """
-        prompt = self.prompt_entry.get()  # Get the prompt from the entry field
+        prompt = self.prompt_entry.get('1.0', tk.END).strip()  # Get the prompt from the text field
         src_folder = self.src_folder_path.get()  # Get the source folder path
         dst_folder = self.dst_folder_path.get()  # Get the destination folder path
 
@@ -225,14 +230,14 @@ class SmartVisionAIApp:
         """
         logger_window = tk.Toplevel(self.root)  # Create a new top-level window for logging
         logger_window.title("Processing Status")
-        logger_window.geometry("1000x300")
+        logger_window.geometry("900x400")
 
         # Create a frame to hold the Text and Scrollbar
         frame = tk.Frame(logger_window)
         frame.pack(expand=True, fill='both')
 
         # Create a Text widget for log messages
-        log_text = tk.Text(frame, font=self.default_font, wrap='word')
+        log_text = tk.Text(frame, font=self.default_font, bg='black', wrap='word')
         log_text.pack(expand=True, fill='both', side=tk.LEFT)
 
         # Create a Scrollbar and associate it with the Text widget
@@ -243,30 +248,37 @@ class SmartVisionAIApp:
         # Clear the log_text widget initially
         log_text.delete("1.0", tk.END)
 
-        # Function to update the log text
-        def update_log():
-            """
-            Update the log text widget by reading the latest logs from the log file.
+        text_colors = {
+            'DEBUG': 'white',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'dark red',
+        }
+        # Configure tags for each log level
+        for level, color in text_colors.items():
+            log_text.tag_configure(level, foreground=color)
 
-            This function is called every second to refresh the displayed log content.
-            """
-            try:
-                with open("app.log", "r", encoding='utf-8') as log_file:
-                    current_logs = log_file.read()
+        try:
+            with open("app.log", "r", encoding='utf-8') as log_file:
+                current_logs = log_file.readlines()
 
-                    # Only append if there's new content
-                    if current_logs:
-                        log_text.delete("1.0", tk.END)  # Clear old content
-                        log_text.insert(tk.END, current_logs)  # Insert current log contents
-                        log_text.yview(tk.END)  # Auto-scroll to the bottom
+                for log in current_logs:
+                    time.sleep(1)  # Simulate a delay for each log entry display
 
-            except Exception as e:
-                log_text.insert(tk.END, f"Error reading log file: {e}\n")
+                    # Get log level from log context
+                    log_level = log.split(' - ')[1].strip()
 
-            # Schedule the next log update
-            log_text.after(1000, update_log)  # Update every 1 second
+                    # Insert log with the appropriate color tag
+                    log_text.insert(tk.END, log, log_level)
 
-        update_log()  # Start the log update loop
+                    # Scroll to the latest line
+                    log_text.see(tk.END)
+
+                log_text.yview(tk.END)  # Auto-scroll to the bottom
+
+        except Exception as e:
+            log_text.insert(tk.END, f"Error reading log file: {e}\n", 'ERROR')
 
     def run_add_metadata(self):
         """
@@ -275,7 +287,7 @@ class SmartVisionAIApp:
         This method retrieves input values and calls the ImagesDescriber to add metadata
         to the images in the specified folder.
         """
-        prompt = self.prompt_entry.get()  # Get the prompt from the entry field
+        prompt = self.prompt_entry.get('1.0', tk.END).strip()  # Get the prompt from the text field
         src_folder = self.src_folder_path.get()  # Get the source folder path
         dst_folder = self.dst_folder_path.get()  # Get the destination folder path
         author_name = (
@@ -298,7 +310,7 @@ class SmartVisionAIApp:
 
         This method retrieves input values and calls the CSVGenerator to write the image metadata to a CSV file.
         """
-        prompt = self.prompt_entry.get()  # Get the prompt from the entry field
+        prompt = self.prompt_entry.get('1.0', tk.END).strip()  # Get the prompt from the text field
         src_folder = self.src_folder_path.get()  # Get the source folder path
         dst_folder = self.dst_folder_path.get()  # Get the destination folder path
 
