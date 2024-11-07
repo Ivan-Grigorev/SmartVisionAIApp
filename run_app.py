@@ -1,13 +1,13 @@
 """Main script to execute the image description and metadata generation project."""
 
+import logging
 import threading
-import time
 import tkinter as tk
 from tkinter import filedialog, font, messagebox
 
 from src.csv_generator import CSVGenerator
 from src.image_describer import ImagesDescriber
-from src.services.logging_config import setup_logger
+from src.services.logging_config import TextHandler, setup_logger
 
 # Initialize logger using the setup function
 logger = setup_logger(__name__)
@@ -230,7 +230,7 @@ class SmartVisionAIApp:
         """
         logger_window = tk.Toplevel(self.root)  # Create a new top-level window for logging
         logger_window.title("Processing Status")
-        logger_window.geometry("900x400")
+        logger_window.geometry("1000x400")
 
         # Create a frame to hold the Text and Scrollbar
         frame = tk.Frame(logger_window)
@@ -245,9 +245,6 @@ class SmartVisionAIApp:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         log_text.config(yscrollcommand=scrollbar.set)
 
-        # Clear the log_text widget initially
-        log_text.delete("1.0", tk.END)
-
         text_colors = {
             'DEBUG': 'white',
             'INFO': 'green',
@@ -259,26 +256,17 @@ class SmartVisionAIApp:
         for level, color in text_colors.items():
             log_text.tag_configure(level, foreground=color)
 
-        try:
-            with open("app.log", "r", encoding='utf-8') as log_file:
-                current_logs = log_file.readlines()
+        # Set up TextHandler for live logging in the Text widget
+        text_handler = TextHandler(log_text)
+        text_handler.setFormatter(
+            logging.Formatter(
+                '%(asctime)s - %(levelname)s - %(message)s', datefmt='%d/%m/%Y %H:%M:%S'
+            )
+        )
 
-                for log in current_logs:
-                    time.sleep(1)  # Simulate a delay for each log entry display
-
-                    # Get log level from log context
-                    log_level = log.split(' - ')[1].strip()
-
-                    # Insert log with the appropriate color tag
-                    log_text.insert(tk.END, log, log_level)
-
-                    # Scroll to the latest line
-                    log_text.see(tk.END)
-
-                log_text.yview(tk.END)  # Auto-scroll to the bottom
-
-        except Exception as e:
-            log_text.insert(tk.END, f"Error reading log file: {e}\n", 'ERROR')
+        # Attach the TextHandler to the app logger
+        app_logger = setup_logger('root')
+        app_logger.addHandler(text_handler)
 
     def run_add_metadata(self):
         """
@@ -293,10 +281,6 @@ class SmartVisionAIApp:
         author_name = (
             self.author_entry.get() if hasattr(self, 'author_entry') else None
         )  # Get the author name if present
-
-        # Clear all logger records
-        with open('app.log', 'w'):
-            pass
 
         logger.info("Starting metadata addition...")
         image_describer = ImagesDescriber(
@@ -313,10 +297,6 @@ class SmartVisionAIApp:
         prompt = self.prompt_entry.get('1.0', tk.END).strip()  # Get the prompt from the text field
         src_folder = self.src_folder_path.get()  # Get the source folder path
         dst_folder = self.dst_folder_path.get()  # Get the destination folder path
-
-        # Clear all logger records
-        with open('app.log', 'w'):
-            pass
 
         logger.info("Starting CSV generation...")
         csv_generator = CSVGenerator(prompt=prompt, src_path=src_folder, dst_path=dst_folder)
