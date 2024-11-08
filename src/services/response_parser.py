@@ -2,6 +2,7 @@
 
 import re
 import string
+import sys
 from typing import Optional
 
 from src.services.chatgpt_responder import process_photo
@@ -28,8 +29,9 @@ def parse_response(image_file, prompt, image_caption: Optional[str] = None):
 
     # Check if there is an error in the ChatGPT response
     if 'error' in gpt_response.keys():
-        logger.error(f"{gpt_response.get('error')['message']}")
+        logger.critical(f"{gpt_response.get('error')['message']}")
         # Exit the program with a status code 1
+        sys.exit(1)
 
     try:
         content = gpt_response['choices'][0].get('message').get('content')

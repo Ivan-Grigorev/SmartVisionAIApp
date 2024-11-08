@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import sys
 import tempfile
 import time
 
@@ -72,6 +73,15 @@ class ImagesDescriber:
 
         # Get filtered image files to process
         filtered_image_files = filter_files_by_extension(src_path=self.src_path)
+
+        # Check if image files exist, stop processing if not
+        if not filtered_image_files:
+            logger.warning(
+                f"No image files found in the source folder {self.src_path} to process. Please verify and try again."
+            )
+            # Exit the program with a status code 1
+            sys.exit(1)
+
         logger.info(
             f"Images processing has started! {len(filtered_image_files)} images to process."
         )

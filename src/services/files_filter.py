@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import sys
 from pathlib import Path
 
 from PIL import Image, JpegImagePlugin
@@ -33,6 +34,8 @@ def filter_files_by_extension(src_path):
             f"No files found in the source folder '{src_path}' to process.\n"
             f"Please verify and try again."
         )
+        # Exit the program with a status code 1
+        sys.exit(1)
 
     logger.info("Starting to filter files by image types in the source folder.")
 

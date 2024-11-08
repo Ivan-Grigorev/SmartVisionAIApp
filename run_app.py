@@ -347,10 +347,12 @@ class SmartVisionAIApp:
                 'INFO': 'green',
                 'WARNING': 'yellow',
                 'ERROR': 'red',
-                'CRITICAL': 'dark red',
+                'CRITICAL': 'red',
             }
             # Configure tags for each log level
             for level, color in text_colors.items():
+                if level == 'CRITICAL':
+                    log_text.tag_configure(level, foreground=color, font=('Verdana', 14, 'bold'))
                 log_text.tag_configure(level, foreground=color)
 
             # Set up TextHandler for live logging in the Text widget

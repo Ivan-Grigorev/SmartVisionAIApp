@@ -4,6 +4,7 @@ import base64
 from typing import Optional
 
 import requests
+import sys
 
 from src.services.logging_config import setup_logger
 
@@ -15,7 +16,11 @@ try:
     with open('./openai_key.txt', 'r') as f:
         API_KEY = f.read().strip()
 except FileNotFoundError as e:
-    logger.error(f"Could not find {e.filename}. Please ensure the file exists and is accessible.")
+    logger.critical(
+        f"Could not find {e.filename}. Please ensure the file exists and is accessible."
+    )
+    # Exit the program with a status code 1
+    sys.exit(1)
 
 
 def process_photo(image_file, prompt, image_caption: Optional[str] = None):
