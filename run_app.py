@@ -48,7 +48,7 @@ class SmartVisionAIApp:
             font=self.bold_font,
             height=2,
             width=30,
-            command=self.open_add_metadata_window,
+            command=self._create_add_metadata_window,
         ).pack(pady=10)
 
         # Create "Generate CSV" button
@@ -58,111 +58,203 @@ class SmartVisionAIApp:
             font=self.bold_font,
             height=2,
             width=30,
-            command=self.open_generate_csv_window,
+            command=self._create_generate_csv_window,
         ).pack(pady=10)
 
-    def open_add_metadata_window(self):
+        # Initialize variables to track the windows
+        self.add_metadata_window = None
+        self.generate_csv_window = None
+        self.processing_status_window = None
+
+    def _create_add_metadata_window(self):
         """
         Open the window for adding metadata to images.
 
-        This window allows users to describe images and add metadata (title, description, and keywords)
-        directly to the image files in a selected folder.
+        This window allows users to describe images and add metadata (title, description, keywords,
+         and author name) directly to the image files in a selected folder.
         """
-        self._create_option_window(
-            "Add Metadata",
-            "Describe all images in the source folder using ChatGPT,"
-            " add metadata (title, description, and keywords) directly to"
-            " the image files, and save them in the destination folder.",
-            self.run_add_metadata,
-            include_author=True,
+        title = 'Add Metadata'
+        description = (
+            "Describe all images in the source folder using ChatGPT, "
+            "add metadata (title, description, keywords, and author name) directly to "
+            "the image files, and save them in the destination folder."
         )
 
-    def open_generate_csv_window(self):
+        # If the window doesn't exist, create it
+        if self.add_metadata_window is None or not tk.Toplevel.winfo_exists(
+            self.add_metadata_window
+        ):
+            self.add_metadata_window = tk.Toplevel(self.root)
+            self.add_metadata_window.title(title)
+            self.add_metadata_window.geometry('700x600')
+
+            # Labels and entries for title and description
+            tk.Label(
+                self.add_metadata_window,
+                text=title,
+                font=self.bold_font,
+            ).pack(pady=10)
+            tk.Label(
+                self.add_metadata_window,
+                text=description,
+                font=self.default_font,
+                wraplength=400,
+                justify="center",
+            ).pack(pady=10)
+
+            # Entry for prompt input with scrollable Text widget
+            self.prompt_entry = tk.Text(self.add_metadata_window, width=45, height=8, wrap="word")
+            tk.Label(
+                self.add_metadata_window,
+                text="Prompt",
+                font=self.default_font,
+            ).pack(pady=(10, 0))
+            self.prompt_entry.pack(pady=10)
+
+            # Scrollbar for the Text widget
+            scrollbar = tk.Scrollbar(self.add_metadata_window, command=self.prompt_entry.yview)
+            self.prompt_entry.config(yscrollcommand=scrollbar.set)
+
+            # Folder selection buttons for source and destination
+            self.src_folder_path = tk.StringVar()
+            tk.Button(
+                self.add_metadata_window,
+                text="Select Source Folder",
+                font=self.default_font,
+                command=self.select_src_folder,
+                width=25,
+            ).pack(pady=10)
+            tk.Label(
+                self.add_metadata_window,
+                textvariable=self.src_folder_path,
+                fg='white',
+            ).pack()
+
+            self.dst_folder_path = tk.StringVar()
+            tk.Button(
+                self.add_metadata_window,
+                text="Select Destination Folder",
+                font=self.default_font,
+                command=self.select_dst_folder,
+                width=25,
+            ).pack(pady=10)
+            tk.Label(
+                self.add_metadata_window,
+                textvariable=self.dst_folder_path,
+                fg='white',
+            ).pack()
+
+            self.author_entry = tk.Entry(self.add_metadata_window, width=40)
+            tk.Label(
+                self.add_metadata_window,
+                text="Author Name (optional)",
+                font=self.default_font,
+            ).pack(pady=(10, 0))
+            self.author_entry.pack(pady=5)
+
+            # RUN button to initiate the processing
+            tk.Button(
+                self.add_metadata_window,
+                text="RUN",
+                font=self.default_font,
+                command=lambda: self.confirm_and_run(self.run_add_metadata),
+            ).pack(pady=20)
+
+        else:
+            # If the window already exists, lift it to the front
+            self.add_metadata_window.lift()
+            self.add_metadata_window.focus_force()
+
+    def _create_generate_csv_window(self):
         """
         Open the window for generating a CSV file from image metadata.
 
         This window allows users to describe images and generate a CSV file with the image filename,
         titles, descriptions, and keywords, saving it to a selected destination folder.
         """
-        self._create_option_window(
-            "Generate CSV",
-            "Describe all images in the source folder using ChatGPT,"
-            " generate a CSV file with the image filename, titles, "
-            "descriptions, and keywords, and save the CSV file to the"
-            " destination folder.",
-            self.run_generate_csv,
-            include_author=False,
+
+        title = "Generate CSV"
+        description = (
+            "Describe all images in the source folder using ChatGPT, "
+            "generate a CSV file with the image filename, titles, descriptions,"
+            " and keywords, and save the CSV file to the destination folder."
         )
 
-    def _create_option_window(self, title, description, run_callback, include_author):
-        """
-        Create a window for selecting options and input fields for metadata or CSV generation.
+        # If the window doesn't exist, create it
+        if self.generate_csv_window is None or not tk.Toplevel.winfo_exists(
+            self.generate_csv_window
+        ):
+            self.generate_csv_window = tk.Toplevel(self.root)  # Create a new top-level window
+            self.generate_csv_window.title(title)
+            self.generate_csv_window.geometry("700x600")
 
-        Attributes:
-            title (str): The title of the option window.
-            description (str): A description of the action to be performed.
-            run_callback (callable): The function to call when the user clicks the "RUN" button.
-            include_author (bool): Whether to include an author name entry in the window.
-        """
-        window = tk.Toplevel(self.root)  # Create a new top-level window
-        window.title(title)
-        window.geometry("700x600")
+            # Labels and entries for title and description
+            tk.Label(
+                self.generate_csv_window,
+                text=title,
+                font=self.bold_font,
+            ).pack(pady=10)
+            tk.Label(
+                self.generate_csv_window,
+                text=description,
+                font=self.default_font,
+                wraplength=400,
+                justify="center",
+            ).pack(pady=10)
 
-        # Labels and entries for title and description
-        tk.Label(window, text=title, font=self.bold_font).pack(pady=10)
-        tk.Label(
-            window,
-            text=description,
-            font=self.default_font,
-            wraplength=400,
-            justify="center",
-        ).pack(pady=10)
+            # Entry for prompt input with scrollable Text widget
+            self.prompt_entry = tk.Text(self.generate_csv_window, width=45, height=8, wrap="word")
+            tk.Label(
+                self.generate_csv_window,
+                text="Prompt",
+                font=self.default_font,
+            ).pack(pady=(10, 0))
+            self.prompt_entry.pack(pady=10)
 
-        # Entry for prompt input with scrollable Text widget
-        self.prompt_entry = tk.Text(window, width=45, height=8, wrap="word")
-        tk.Label(window, text="Prompt", font=self.default_font).pack(pady=(10, 0))
-        self.prompt_entry.pack(pady=10)
+            # Scrollbar for the Text widget
+            scrollbar = tk.Scrollbar(self.generate_csv_window, command=self.prompt_entry.yview)
+            self.prompt_entry.config(yscrollcommand=scrollbar.set)
 
-        # Scrollbar for the Text widget
-        scrollbar = tk.Scrollbar(window, command=self.prompt_entry.yview)
-        self.prompt_entry.config(yscrollcommand=scrollbar.set)
+            # Folder selection buttons for source and destination
+            self.src_folder_path = tk.StringVar()
+            tk.Button(
+                self.generate_csv_window,
+                text="Select Source Folder",
+                font=self.default_font,
+                command=self.select_src_folder,
+                width=25,
+            ).pack(pady=10)
+            tk.Label(
+                self.generate_csv_window,
+                textvariable=self.src_folder_path,
+                fg='white',
+            ).pack()
 
-        # Folder selection buttons for source and destination
-        self.src_folder_path = tk.StringVar()
-        tk.Button(
-            window,
-            text="Select Source Folder",
-            font=self.default_font,
-            command=self.select_src_folder,
-            width=25,
-        ).pack(pady=10)
-        tk.Label(window, textvariable=self.src_folder_path, fg='white').pack()
+            self.dst_folder_path = tk.StringVar()
+            tk.Button(
+                self.generate_csv_window,
+                text="Select Destination Folder",
+                font=self.default_font,
+                command=self.select_dst_folder,
+                width=25,
+            ).pack(pady=10)
+            tk.Label(
+                self.generate_csv_window,
+                textvariable=self.dst_folder_path,
+                fg='white',
+            ).pack()
 
-        self.dst_folder_path = tk.StringVar()
-        tk.Button(
-            window,
-            text="Select Destination Folder",
-            font=self.default_font,
-            command=self.select_dst_folder,
-            width=25,
-        ).pack(pady=10)
-        tk.Label(window, textvariable=self.dst_folder_path, fg='white').pack()
-
-        # If author name is required, create an entry for it
-        if include_author:
-            self.author_entry = tk.Entry(window, width=40)
-            tk.Label(window, text="Author Name (optional)", font=self.default_font).pack(
-                pady=(10, 0)
-            )
-            self.author_entry.pack(pady=5)
-
-        # RUN button to initiate the processing
-        tk.Button(
-            window,
-            text="RUN",
-            font=self.default_font,
-            command=lambda: self.confirm_and_run(run_callback),
-        ).pack(pady=20)
+            # RUN button to initiate the processing
+            tk.Button(
+                self.generate_csv_window,
+                text="RUN",
+                font=self.default_font,
+                command=lambda: self.confirm_and_run(self.run_generate_csv),
+            ).pack(pady=20)
+        else:
+            # If the window already exists, lift it to the front
+            self.generate_csv_window.lift()
+            self.generate_csv_window.focus_force()
 
     def select_src_folder(self):
         """
@@ -187,9 +279,9 @@ class SmartVisionAIApp:
         Attributes:
             run_callback (callable): The function to run for processing.
         """
-        prompt = self.prompt_entry.get('1.0', tk.END).strip()  # Get the prompt from the text field
-        src_folder = self.src_folder_path.get()  # Get the source folder path
-        dst_folder = self.dst_folder_path.get()  # Get the destination folder path
+        prompt = self.prompt_entry.get('1.0', tk.END).strip()
+        src_folder = self.src_folder_path.get()
+        dst_folder = self.dst_folder_path.get()
 
         # Check for required fields and show error messages if any are missing
         if not prompt:
@@ -228,45 +320,54 @@ class SmartVisionAIApp:
 
         The log messages are updated every second by reading from the log file.
         """
-        logger_window = tk.Toplevel(self.root)  # Create a new top-level window for logging
-        logger_window.title("Processing Status")
-        logger_window.geometry("1000x400")
 
-        # Create a frame to hold the Text and Scrollbar
-        frame = tk.Frame(logger_window)
-        frame.pack(expand=True, fill='both')
+        # If the window doesn't exist, create it
+        if self.processing_status_window is None or not tk.Toplevel.winfo_exists(
+            self.processing_status_window
+        ):
+            self.processing_status_window = tk.Toplevel(self.root)
+            self.processing_status_window.title("Processing Status")
+            self.processing_status_window.geometry("1000x400")
 
-        # Create a Text widget for log messages
-        log_text = tk.Text(frame, font=self.default_font, bg='black', wrap='word')
-        log_text.pack(expand=True, fill='both', side=tk.LEFT)
+            # Create a frame to hold the Text and Scrollbar
+            frame = tk.Frame(self.processing_status_window)
+            frame.pack(expand=True, fill='both')
 
-        # Create a Scrollbar and associate it with the Text widget
-        scrollbar = tk.Scrollbar(frame, command=log_text.yview)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        log_text.config(yscrollcommand=scrollbar.set)
+            # Create a Text widget for log messages
+            log_text = tk.Text(frame, font=self.default_font, bg='black', wrap='word')
+            log_text.pack(expand=True, fill='both', side=tk.LEFT)
 
-        text_colors = {
-            'DEBUG': 'white',
-            'INFO': 'green',
-            'WARNING': 'yellow',
-            'ERROR': 'red',
-            'CRITICAL': 'dark red',
-        }
-        # Configure tags for each log level
-        for level, color in text_colors.items():
-            log_text.tag_configure(level, foreground=color)
+            # Create a Scrollbar and associate it with the Text widget
+            scrollbar = tk.Scrollbar(frame, command=log_text.yview)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            log_text.config(yscrollcommand=scrollbar.set)
 
-        # Set up TextHandler for live logging in the Text widget
-        text_handler = TextHandler(log_text)
-        text_handler.setFormatter(
-            logging.Formatter(
-                '%(asctime)s - %(levelname)s - %(message)s', datefmt='%d/%m/%Y %H:%M:%S'
+            text_colors = {
+                'DEBUG': 'white',
+                'INFO': 'green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'dark red',
+            }
+            # Configure tags for each log level
+            for level, color in text_colors.items():
+                log_text.tag_configure(level, foreground=color)
+
+            # Set up TextHandler for live logging in the Text widget
+            text_handler = TextHandler(log_text)
+            text_handler.setFormatter(
+                logging.Formatter(
+                    '%(asctime)s - %(levelname)s - %(message)s', datefmt='%d/%m/%Y %H:%M:%S'
+                )
             )
-        )
 
-        # Attach the TextHandler to the app logger
-        app_logger = setup_logger('root')
-        app_logger.addHandler(text_handler)
+            # Attach the TextHandler to the app logger
+            app_logger = setup_logger('root')
+            app_logger.addHandler(text_handler)
+        else:
+            # If the window already exists, lift it to the front
+            self.processing_status_window.lift()
+            self.processing_status_window.focus_force()
 
     def run_add_metadata(self):
         """
@@ -275,14 +376,12 @@ class SmartVisionAIApp:
         This method retrieves input values and calls the ImagesDescriber to add metadata
         to the images in the specified folder.
         """
-        prompt = self.prompt_entry.get('1.0', tk.END).strip()  # Get the prompt from the text field
-        src_folder = self.src_folder_path.get()  # Get the source folder path
-        dst_folder = self.dst_folder_path.get()  # Get the destination folder path
-        author_name = (
-            self.author_entry.get() if hasattr(self, 'author_entry') else None
-        )  # Get the author name if present
+        prompt = self.prompt_entry.get('1.0', tk.END).strip()
+        src_folder = self.src_folder_path.get()
+        dst_folder = self.dst_folder_path.get()
+        author_name = self.author_entry.get() if hasattr(self, 'author_entry') else None
 
-        logger.info("Starting metadata addition...")
+        logger.info("Starting Metadata addition...")
         image_describer = ImagesDescriber(
             prompt=prompt, src_path=src_folder, dst_path=dst_folder, author_name=author_name
         )
@@ -294,9 +393,9 @@ class SmartVisionAIApp:
 
         This method retrieves input values and calls the CSVGenerator to write the image metadata to a CSV file.
         """
-        prompt = self.prompt_entry.get('1.0', tk.END).strip()  # Get the prompt from the text field
-        src_folder = self.src_folder_path.get()  # Get the source folder path
-        dst_folder = self.dst_folder_path.get()  # Get the destination folder path
+        prompt = self.prompt_entry.get('1.0', tk.END).strip()
+        src_folder = self.src_folder_path.get()
+        dst_folder = self.dst_folder_path.get()
 
         logger.info("Starting CSV generation...")
         csv_generator = CSVGenerator(prompt=prompt, src_path=src_folder, dst_path=dst_folder)
