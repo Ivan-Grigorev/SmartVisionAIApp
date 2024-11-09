@@ -44,7 +44,7 @@ SmartVisionAIApp is an image metadata processing tool that allows users to add d
 SmartVisionAIApp/
 ├── LICENSE
 ├── README.md
-├── app.log                    # Log file generated during runtime
+├── builddmg.sh
 ├── openai_key.txt             # File to store OpenAI API key for image descriptions
 ├── requirements.txt           # Python dependencies for the project
 ├── run_app.py                 # Main script to execute the application
@@ -62,6 +62,50 @@ SmartVisionAIApp/
         └── response_parser.py      # Parses responses from GPT model
 ```
 
+## Creating a Standalone Executable with PyInstaller
+
+To distribute **SmartVisionAIApp** as a standalone executable, you can use **PyInstaller**, which bundles your Python application and all of its dependencies into a single file. Since **PyInstaller** is already included in `requirements.txt`, you don’t need to install it separately.
+
+1. **Create the Executable**
+   To create an executable, run the following command in the root directory of the project:
+   ```bash
+   pyinstaller --name 'SmartVisionAI' --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico run_app.py
+   ```
+   Explanation of the options:
+   - `--name 'SmartVisionAI'`: Sets the name of the executable.
+   - `--onefile`: Bundles the app into a single executable file.
+   - `--windowed`: Disables the command line window (for GUI apps).
+   - `--icon=src/app_icons/smartvisionaiapp.ico`: Adds an icon to the executable (ensure the icon path is correct).
+
+2. **Find the Executable**
+   After running the command, the executable will be created in the `dist` directory within your project folder. You can now share or distribute this standalone executable.
+
+## Creating a macOS Disk Image for Installation
+
+To create a macOS disk image for installing **SmartVisionAIApp**, you can use the `builddmg.sh` script included in the project. This script automates the process of creating a `.dmg` file for easy distribution on macOS.
+
+### Steps to Use the `builddmg.sh` Script
+
+1. **Ensure You Have the Necessary Tools**
+   Make sure you have **Homebrew** installed and the necessary dependencies like `hdiutil` for macOS. If not, you can install Homebrew by following the instructions at [https://brew.sh/](https://brew.sh/).
+
+2. **Make the Script Executable**
+   Open a terminal and navigate to the directory where the `builddmg.sh` file is located. Run the following command to make the script executable:
+   ```bash
+   chmod +x builddmg.sh
+   ```
+
+3. **Run the Script**
+   Execute the script with the following command:
+   ```bash
+   ./builddmg.sh
+   ```
+   This script will:
+   - Build the application into an executable (if not already done).
+   - Create a `.dmg` file with the packaged app inside, ready for distribution.
+
+4. **Find the Disk Image**
+   After the script finishes, you will find the `.dmg` file in the root project directory. You can now use it for installation on macOS.
 ## License
 
 This project is licensed under the terms of the [LICENSE](./LICENSE).
