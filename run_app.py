@@ -3,7 +3,7 @@
 import logging
 import threading
 import tkinter as tk
-from tkinter import filedialog, font, messagebox
+from tkinter import PhotoImage, filedialog, font, messagebox
 
 from src.csv_generator import CSVGenerator
 from src.image_describer import ImagesDescriber
@@ -37,9 +37,40 @@ class SmartVisionAIApp:
         self.default_font = font.Font(family="Verdana", size=14)
         self.bold_font = font.Font(family="Verdana", size=16, weight="bold")
 
+        # Initialize variables to track the windows
+        self.app_settings_window = None
+        self.add_metadata_window = None
+        self.generate_csv_window = None
+        self.processing_status_window = None
+
+        # Open main window
+        self._create_main_window()
+
+    def _create_main_window(self):
+        """
+        Open main window.
+
+        This window opens with app starting and allow users to choose options.
+        """
+        # Frame to hold the settings button at the top right
+        top_frame = tk.Frame(self.root)
+        top_frame.pack(side='top', fill='x', padx=10, pady=10)
+
         # Create a frame for the main buttons and center it
         button_frame = tk.Frame(self.root)
         button_frame.pack(expand=True)
+
+        # Create "Settings" button
+        settings_icon = PhotoImage("src/app_icons/settings.png")
+        tk.Button(
+            top_frame,
+            text='Settings',
+            font=self.default_font,
+            image=settings_icon,
+            command=self._create_app_settings_window,
+            borderwidth=0,
+            background='black',
+        ).pack(side='right')
 
         # Create "Add Metadata" button
         tk.Button(
@@ -61,10 +92,58 @@ class SmartVisionAIApp:
             command=self._create_generate_csv_window,
         ).pack(pady=10)
 
-        # Initialize variables to track the windows
-        self.add_metadata_window = None
-        self.generate_csv_window = None
-        self.processing_status_window = None
+    def _create_app_settings_window(self):
+        """
+        Open the application settings window for SmartVisionAI.
+
+        This window allow users to configure the application settings.
+        """
+        title = 'SmartVisionAI Settings'
+        description = "Set up all necessary SmartVisionAI application configurations"
+
+        # If the window doesn't exist, create it
+        if self.app_settings_window is None or not tk.Toplevel.winfo_exists(
+            self.app_settings_window
+        ):
+            self.app_settings_window = tk.Toplevel(self.root)
+            self.app_settings_window.title(title)
+            self.app_settings_window.geometry('500x300')
+
+            # Labels and entries for title and description
+            tk.Label(
+                self.app_settings_window,
+                text=title,
+                font=self.bold_font,
+            ).pack(pady=10)
+            tk.Label(
+                self.app_settings_window,
+                text=description,
+                font=self.default_font,
+                wraplength=400,
+                justify='center',
+            ).pack(pady=10)
+
+            # OpenAI API Key label and entry
+            self.openai_key_entry = tk.Entry(self.app_settings_window, width=40)
+            tk.Label(
+                self.app_settings_window,
+                text='OpenAI API Key',
+                font=self.default_font,
+            ).pack(pady=(10, 0))
+            self.openai_key_entry.pack(pady=10)
+
+            # Save button
+            tk.Button(
+                self.app_settings_window,
+                text='SAVE',
+                font=self.default_font,
+                command=self.save_app_settings,
+            ).pack(pady=20)
+
+        else:
+            # If the window already exists, lift it to the front
+            self.app_settings_window.lift()
+            self.app_settings_window.focus_force()
 
     def _create_add_metadata_window(self):
         """
@@ -255,6 +334,23 @@ class SmartVisionAIApp:
             # If the window already exists, lift it to the front
             self.generate_csv_window.lift()
             self.generate_csv_window.focus_force()
+
+    def save_app_settings(self):
+        """
+        Save the SmartVisionAI app configuration settings.
+
+        Writes the OpenAI API Key by the user to 'openai_key.txt'.
+        """
+        openai_key = self.openai_key_entry.get().strip()
+
+        if not openai_key:
+            messagebox.showerror("Error", "OpenAI API Key is required")
+
+        else:
+            with open('openai_key.txt', 'w') as openai_file:
+                openai_file.write(openai_key)
+            messagebox.showinfo("Success", "OpenAI API Key saved successfully")
+            self.app_settings_window.destroy()  # Close after confirm
 
     def select_src_folder(self):
         """
