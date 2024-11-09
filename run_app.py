@@ -3,7 +3,7 @@
 import logging
 import threading
 import tkinter as tk
-from tkinter import PhotoImage, filedialog, font, messagebox
+from tkinter import filedialog, font, messagebox
 
 from src.csv_generator import CSVGenerator
 from src.image_describer import ImagesDescriber
@@ -37,6 +37,9 @@ class SmartVisionAIApp:
         self.default_font = font.Font(family="Verdana", size=14)
         self.bold_font = font.Font(family="Verdana", size=16, weight="bold")
 
+        # Initialize settings button
+        self.settings_icon = tk.PhotoImage(file="src/app_icons/settings.png").subsample(10, 10)
+
         # Initialize variables to track the windows
         self.app_settings_window = None
         self.add_metadata_window = None
@@ -61,14 +64,10 @@ class SmartVisionAIApp:
         button_frame.pack(expand=True)
 
         # Create "Settings" button
-        settings_icon = PhotoImage("src/app_icons/settings.png")
         tk.Button(
             top_frame,
-            text='Settings',
-            font=self.default_font,
-            image=settings_icon,
+            image=self.settings_icon,
             command=self._create_app_settings_window,
-            borderwidth=0,
             background='black',
         ).pack(side='right')
 
@@ -107,7 +106,7 @@ class SmartVisionAIApp:
         ):
             self.app_settings_window = tk.Toplevel(self.root)
             self.app_settings_window.title(title)
-            self.app_settings_window.geometry('500x300')
+            self.app_settings_window.geometry('600x400')
 
             # Labels and entries for title and description
             tk.Label(
@@ -136,7 +135,9 @@ class SmartVisionAIApp:
             tk.Button(
                 self.app_settings_window,
                 text='SAVE',
-                font=self.default_font,
+                font=self.bold_font,
+                background='green',
+                width=15,
                 command=self.save_app_settings,
             ).pack(pady=20)
 
@@ -165,7 +166,7 @@ class SmartVisionAIApp:
         ):
             self.add_metadata_window = tk.Toplevel(self.root)
             self.add_metadata_window.title(title)
-            self.add_metadata_window.geometry('700x600')
+            self.add_metadata_window.geometry('700x700')
 
             # Labels and entries for title and description
             tk.Label(
@@ -235,8 +236,10 @@ class SmartVisionAIApp:
             tk.Button(
                 self.add_metadata_window,
                 text="RUN",
-                font=self.default_font,
+                font=self.bold_font,
                 command=lambda: self.confirm_and_run(self.run_add_metadata),
+                width=15,
+                background='green',
             ).pack(pady=20)
 
         else:
@@ -327,7 +330,9 @@ class SmartVisionAIApp:
             tk.Button(
                 self.generate_csv_window,
                 text="RUN",
-                font=self.default_font,
+                font=self.bold_font,
+                background='green',
+                width=15,
                 command=lambda: self.confirm_and_run(self.run_generate_csv),
             ).pack(pady=20)
         else:
