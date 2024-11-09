@@ -11,17 +11,6 @@ from src.services.logging_config import setup_logger
 # Initialize logger using the setup function
 logger = setup_logger(__name__)
 
-# Set your OpenAI API key
-try:
-    with open('./openai_key.txt', 'r') as f:
-        API_KEY = f.read().strip()
-except FileNotFoundError as e:
-    logger.critical(
-        f"Could not find {e.filename}. Please ensure the file exists and is accessible."
-    )
-    # Exit the program with a status code 1
-    sys.exit(1)
-
 
 def process_photo(image_file, prompt, image_caption: Optional[str] = None):
     """
@@ -35,6 +24,17 @@ def process_photo(image_file, prompt, image_caption: Optional[str] = None):
     Returns:
          dict: A JSON object containing the generated title, description, and keywords.
     """
+    # Set your OpenAI API key
+    try:
+        with open('./openai_key.txt', 'r') as f:
+            API_KEY = f.read().strip()
+    except FileNotFoundError as e:
+        logger.critical(
+            f"Could not find {e.filename}. Please ensure the file exists and is accessible."
+        )
+        # Exit the program with a status code 1
+        sys.exit(1)
+
     # Convert the image to a based64 string
     image_base64 = base64.b64encode(image_file.read()).decode('ascii')
 
