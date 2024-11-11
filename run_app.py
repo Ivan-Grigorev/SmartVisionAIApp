@@ -37,9 +37,6 @@ class SmartVisionAIApp:
         self.default_font = font.Font(family="Verdana", size=14)
         self.bold_font = font.Font(family="Verdana", size=16, weight="bold")
 
-        # Initialize settings button
-        self.settings_icon = tk.PhotoImage(file="src/app_icons/settings.png").subsample(10, 10)
-
         # Initialize variables to track the windows
         self.app_settings_window = None
         self.add_metadata_window = None
@@ -48,6 +45,9 @@ class SmartVisionAIApp:
 
         # Open main window
         self._create_main_window()
+
+        # Bind the confirm_close_app method to the app close
+        self.root.protocol('WM_DELETE_WINDOW', self.confirm_close_app)
 
     def _create_main_window(self):
         """
@@ -66,7 +66,8 @@ class SmartVisionAIApp:
         # Create "Settings" button
         tk.Button(
             top_frame,
-            image=self.settings_icon,
+            text='Settings',
+            font=self.default_font,
             command=self._create_app_settings_window,
             background='black',
         ).pack(side='right')
@@ -90,6 +91,13 @@ class SmartVisionAIApp:
             width=30,
             command=self._create_generate_csv_window,
         ).pack(pady=10)
+
+    def confirm_close_app(self):
+        """
+        Show a confirmation dialog before closing the application.
+        """
+        if messagebox.askokcancel('Quit', "Are you sure you want to exit?"):
+            self.root.destroy()
 
     def _create_app_settings_window(self):
         """
@@ -206,8 +214,8 @@ class SmartVisionAIApp:
             ).pack(pady=10)
             tk.Label(
                 self.add_metadata_window,
+                font=self.default_font,
                 textvariable=self.src_folder_path,
-                fg='white',
             ).pack()
 
             self.dst_folder_path = tk.StringVar()
@@ -220,8 +228,8 @@ class SmartVisionAIApp:
             ).pack(pady=10)
             tk.Label(
                 self.add_metadata_window,
+                font=self.default_font,
                 textvariable=self.dst_folder_path,
-                fg='white',
             ).pack()
 
             self.author_entry = tk.Entry(self.add_metadata_window, width=40)
@@ -308,8 +316,8 @@ class SmartVisionAIApp:
             ).pack(pady=10)
             tk.Label(
                 self.generate_csv_window,
+                font=self.default_font,
                 textvariable=self.src_folder_path,
-                fg='white',
             ).pack()
 
             self.dst_folder_path = tk.StringVar()
@@ -322,8 +330,8 @@ class SmartVisionAIApp:
             ).pack(pady=10)
             tk.Label(
                 self.generate_csv_window,
+                font=self.default_font,
                 textvariable=self.dst_folder_path,
-                fg='white',
             ).pack()
 
             # RUN button to initiate the processing
@@ -354,8 +362,7 @@ class SmartVisionAIApp:
         else:
             with open('openai_key.txt', 'w') as openai_file:
                 openai_file.write(openai_key)
-            messagebox.showinfo("Success", "OpenAI API Key saved successfully")
-            self.app_settings_window.destroy()  # Close after confirm
+            self.app_settings_window.destroy()  # Close after saving
 
     def select_src_folder(self):
         """
