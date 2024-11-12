@@ -69,7 +69,6 @@ class SmartVisionAIApp:
             text='Settings',
             font=self.default_font,
             command=self._create_app_settings_window,
-            background='black',
         ).pack(side='right')
 
         # Create "Add Metadata" button
