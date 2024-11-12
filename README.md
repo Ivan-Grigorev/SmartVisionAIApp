@@ -42,24 +42,26 @@ SmartVisionAIApp is an image metadata processing tool that allows users to add d
 
 ```plaintext
 SmartVisionAIApp/
-├── LICENSE
-├── README.md
-├── builddmg.sh
-├── openai_key.txt             # File to store OpenAI API key for image descriptions
-├── requirements.txt           # Python dependencies for the project
-├── run_app.py                 # Main script to execute the application
+├── LICENSE                         # License information for the project
+├── README.md                       # Project documentation
+├── builddmg.sh                     # Script to create a disk image for installation
+├── openai_key.txt                  # File storing the OpenAI API key for image descriptions
+├── requirements.txt                # List of Python dependencies
+├── run_app.py                      # Main script to launch the application
 └── src/
-    ├── __init__.py
-    ├── csv_generator.py       # Module for CSV file generation with image metadata
-    ├── image_describer.py     # Module for the generation of metadata and its addition to the image
+    ├── __init__.py                 # Marks the src directory as a package
+    ├── csv_generator.py            # Generates CSV files with image metadata
+    ├── image_describer.py          # Adds metadata to images based on descriptions
+    ├── app_icons/
+    │   └── smartvisionaiapp.ico    # Icon for the application
     └── services/
-        ├── __init__.py
-        ├── chatgpt_responder.py    # Handles interaction with GPT model
-        ├── check_access.py         # Checks permissions and access to files
-        ├── files_filter.py         # Filters valid image files from a directory
-        ├── logging_config.py       # Logging setup for the application
-        ├── process_timer.py        # Manages processing time for requests
-        └── response_parser.py      # Parses responses from GPT model
+        ├── __init__.py             # Marks the services directory as a package
+        ├── chatgpt_responder.py    # Handles interactions with the GPT model
+        ├── check_access.py         # Verifies permissions and file access
+        ├── files_filter.py         # Filters and validates image files in a directory
+        ├── logging_config.py       # Configures logging for the application
+        ├── process_timer.py        # Displays processing time
+        └── response_parser.py      # Parses and structures responses from the GPT model
 ```
 
 ## Creating a Standalone Executable with PyInstaller
@@ -69,10 +71,10 @@ To distribute **SmartVisionAIApp** as a standalone executable, you can use **PyI
 1. **Create the Executable**
    To create an executable, run the following command in the root directory of the project:
    ```bash
-   pyinstaller --name 'SmartVisionAI' --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico run_app.py
+   pyinstaller --name "SmartVisionAI" --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico run_app.py
    ```
    Explanation of the options:
-   - `--name 'SmartVisionAI'`: Sets the name of the executable.
+   - `--name "SmartVisionAI"`: Sets the name of the executable.
    - `--onefile`: Bundles the app into a single executable file.
    - `--windowed`: Disables the command line window (for GUI apps).
    - `--icon=src/app_icons/smartvisionaiapp.ico`: Adds an icon to the executable (ensure the icon path is correct).
