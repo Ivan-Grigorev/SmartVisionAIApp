@@ -26,7 +26,7 @@ def process_photo(image_file, prompt, image_caption: Optional[str] = None):
     """
     # Set your OpenAI API key
     try:
-        with open('./openai_key.txt', 'r') as f:
+        with open('data/openai_key.txt', 'r') as f:
             API_KEY = f.read().strip()
     except FileNotFoundError as e:
         logger.critical(
