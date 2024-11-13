@@ -48,6 +48,9 @@ SmartVisionAIApp/
 ├── openai_key.txt                  # File storing the OpenAI API key for image descriptions
 ├── requirements.txt                # List of Python dependencies
 ├── run_app.py                      # Main script to launch the application
+├── data/
+│   ├── openai_key.txt              # Stores OpenAI API key
+│   └── prompt_msg.txt              # Stores the user's prompt message
 └── src/
     ├── __init__.py                 # Marks the src directory as a package
     ├── csv_generator.py            # Generates CSV files with image metadata
