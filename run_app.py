@@ -91,13 +91,6 @@ class SmartVisionAIApp:
             command=self._create_generate_csv_window,
         ).pack(pady=10)
 
-    def confirm_close_app(self):
-        """
-        Show a confirmation dialog before closing the application.
-        """
-        if messagebox.askokcancel('Quit', "Are you sure you want to exit?"):
-            self.root.destroy()
-
     def _create_app_settings_window(self):
         """
         Open the application settings window for SmartVisionAI.
@@ -198,6 +191,9 @@ class SmartVisionAIApp:
             ).pack(pady=(10, 0))
             self.prompt_entry.pack(pady=10)
 
+            # Load the last saved prompt message
+            self.get_prompt_message()
+
             # Scrollbar for the Text widget
             scrollbar = tk.Scrollbar(self.add_metadata_window, command=self.prompt_entry.yview)
             self.prompt_entry.config(yscrollcommand=scrollbar.set)
@@ -248,6 +244,12 @@ class SmartVisionAIApp:
                 width=15,
                 background='green',
             ).pack(pady=20)
+
+            # Set the close protocol to save the prompt message when the window closes
+            self.add_metadata_window.protocol(
+                'WM_DELETE_WINDOW',
+                lambda: self.save_prompt_message(current_window=self.add_metadata_window),
+            )
 
         else:
             # If the window already exists, lift it to the front
@@ -300,6 +302,9 @@ class SmartVisionAIApp:
             ).pack(pady=(10, 0))
             self.prompt_entry.pack(pady=10)
 
+            # Load the last saved prompt message
+            self.get_prompt_message()
+
             # Scrollbar for the Text widget
             scrollbar = tk.Scrollbar(self.generate_csv_window, command=self.prompt_entry.yview)
             self.prompt_entry.config(yscrollcommand=scrollbar.set)
@@ -342,10 +347,31 @@ class SmartVisionAIApp:
                 width=15,
                 command=lambda: self.confirm_and_run(self.run_generate_csv),
             ).pack(pady=20)
+
+            # Set the close protocol to save the prompt message when the window closes
+            self.generate_csv_window.protocol(
+                'WM_DELETE_WINDOW',
+                lambda: self.save_prompt_message(current_window=self.generate_csv_window),
+            )
+
         else:
             # If the window already exists, lift it to the front
             self.generate_csv_window.lift()
             self.generate_csv_window.focus_force()
+
+    def get_prompt_message(self):
+        """
+        Load the last saved prompt message from prompt_msg.txt file and display it i the prompt entry widget.
+
+        Raises:
+            Exception: Logs an error if an unexpected exception occurs during the file read process.
+        """
+        try:
+            with open('data/prompt_msg.txt', 'r') as file:
+                last_prompt = file.read()
+                self.prompt_entry.insert('1.0', last_prompt)
+        except Exception as e:
+            logger.error(f"Unexpected error occurred: {e}")
 
     def save_app_settings(self):
         """
@@ -359,9 +385,9 @@ class SmartVisionAIApp:
             messagebox.showerror("Error", "OpenAI API Key is required")
 
         else:
-            with open('openai_key.txt', 'w') as openai_file:
+            with open('data/openai_key.txt', 'w') as openai_file:
                 openai_file.write(openai_key)
-            self.app_settings_window.destroy()  # Close after saving
+            self.app_settings_window.destroy()
 
     def select_src_folder(self):
         """
@@ -490,6 +516,9 @@ class SmartVisionAIApp:
         dst_folder = self.dst_folder_path.get()
         author_name = self.author_entry.get() if hasattr(self, 'author_entry') else None
 
+        # Save the current prompt message
+        self.save_prompt_message()
+
         logger.info("Starting Metadata addition...")
         image_describer = ImagesDescriber(
             prompt=prompt, src_path=src_folder, dst_path=dst_folder, author_name=author_name
@@ -506,9 +535,38 @@ class SmartVisionAIApp:
         src_folder = self.src_folder_path.get()
         dst_folder = self.dst_folder_path.get()
 
+        # Save the current prompt message
+        self.save_prompt_message()
+
         logger.info("Starting CSV generation...")
         csv_generator = CSVGenerator(prompt=prompt, src_path=src_folder, dst_path=dst_folder)
         csv_generator.write_data_to_csv()
+
+    def save_prompt_message(self, current_window=None):
+        """
+        Save the current prompt message to prompt_msg.txt file and optionally close the specified window.
+
+        Attributes:
+            current_window (tk.Toplevel, optional): The currently open app window. Defaults to None.
+
+        Raises:
+            Exception: Logs an error if an unexpected exception occurs during the file write process.
+        """
+        try:
+            with open('data/prompt_msg.txt', 'w') as file:
+                file.write(self.prompt_entry.get('1.0', tk.END).strip())
+        except Exception as e:
+            logger.error(f"Unexpected error occurred: {e}")
+
+        if current_window:
+            current_window.destroy()
+
+    def confirm_close_app(self):
+        """
+        Show a confirmation dialog before closing the application.
+        """
+        if messagebox.askokcancel('Quit', "Are you sure you want to exit?"):
+            self.root.destroy()
 
 
 if __name__ == "__main__":
