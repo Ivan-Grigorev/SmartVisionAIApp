@@ -5,6 +5,7 @@ import threading
 import tkinter as tk
 from tkinter import filedialog, font, messagebox
 
+from data.path_manager import get_data_file_path
 from src.csv_generator import CSVGenerator
 from src.image_describer import ImagesDescriber
 from src.services.logging_config import TextHandler, setup_logger
@@ -367,7 +368,7 @@ class SmartVisionAIApp:
             Exception: Logs an error if an unexpected exception occurs during the file read process.
         """
         try:
-            with open('data/prompt_msg.txt', 'r') as file:
+            with open(get_data_file_path('prompt_msg.txt'), 'r') as file:
                 last_prompt = file.read()
                 self.prompt_entry.insert('1.0', last_prompt)
         except Exception as e:
@@ -385,7 +386,7 @@ class SmartVisionAIApp:
             messagebox.showerror("Error", "OpenAI API Key is required")
 
         else:
-            with open('data/openai_key.txt', 'w') as openai_file:
+            with open(get_data_file_path('openai_key.txt'), 'w') as openai_file:
                 openai_file.write(openai_key)
             self.app_settings_window.destroy()
 
@@ -553,7 +554,7 @@ class SmartVisionAIApp:
             Exception: Logs an error if an unexpected exception occurs during the file write process.
         """
         try:
-            with open('data/prompt_msg.txt', 'w') as file:
+            with open(get_data_file_path('prompt_msg.txt'), 'w') as file:
                 file.write(self.prompt_entry.get('1.0', tk.END).strip())
         except Exception as e:
             logger.error(f"Unexpected error occurred: {e}")

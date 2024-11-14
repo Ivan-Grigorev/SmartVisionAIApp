@@ -6,6 +6,7 @@ from typing import Optional
 import requests
 import sys
 
+from data.path_manager import get_data_file_path
 from src.services.logging_config import setup_logger
 
 # Initialize logger using the setup function
@@ -26,7 +27,7 @@ def process_photo(image_file, prompt, image_caption: Optional[str] = None):
     """
     # Set your OpenAI API key
     try:
-        with open('data/openai_key.txt', 'r') as f:
+        with open(get_data_file_path('openai_key.txt'), 'r') as f:
             API_KEY = f.read().strip()
     except FileNotFoundError as e:
         logger.critical(
