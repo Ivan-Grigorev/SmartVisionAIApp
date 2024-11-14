@@ -49,6 +49,8 @@ SmartVisionAIApp/
 ├── requirements.txt                # List of Python dependencies
 ├── run_app.py                      # Main script to launch the application
 ├── data/
+│   ├── __init__.py                 # Marks the data directory as a package
+│   ├── path_manager.py             # Check and creates a path to data files
 │   ├── openai_key.txt              # Stores OpenAI API key
 │   └── prompt_msg.txt              # Stores the user's prompt message
 └── src/
@@ -69,23 +71,30 @@ SmartVisionAIApp/
 
 ## Creating a Standalone Executable with PyInstaller
 
-To distribute **SmartVisionAIApp** as a standalone executable, you can use **PyInstaller**, which bundles your Python application and all of its dependencies into a single file. Since **PyInstaller** is already included in `requirements.txt`, you don’t need to install it separately.
+To distribute **SmartVisionAIApp** as a standalone executable, you can use **PyInstaller**, which bundles your Python application and all its dependencies into a single file. 
+> [!NOTE]
+> Since **PyInstaller** is already included in `requirements.txt`, you don’t need to install it separately.
 
 1. **Create the Executable**
    To create an executable, run the following command in the root directory of the project:
    ```bash
-   pyinstaller --name "SmartVisionAI" --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico run_app.py
+   pyinstaller --name "SmartVisionAI" --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico \
+    --add-data "data/openai_key.txt:data" \
+    --add-data "data/prompt_msg.txt:data" \
+    run_app.py
    ```
    Explanation of the options:
    - `--name "SmartVisionAI"`: Sets the name of the executable.
    - `--onefile`: Bundles the app into a single executable file.
    - `--windowed`: Disables the command line window (for GUI apps).
    - `--icon=src/app_icons/smartvisionaiapp.ico`: Adds an icon to the executable (ensure the icon path is correct).
+   - `--add-data "data/openai_key.txt:data"`: Includes openai_key.txt in the 'data' folder in the bundle.
+   - `--add-data "data/prompt_msg.txt:data"`: Includes prompt_msg.txt in the 'data' folder in the bundle.
 
 2. **Find the Executable**
    After running the command, the executable will be created in the `dist` directory within your project folder. You can now share or distribute this standalone executable.
 
-## Creating a macOS Disk Image for Installation
+### Creating a macOS Disk Image for Installation
 
 To create a macOS disk image for installing **SmartVisionAIApp**, you can use the `builddmg.sh` script included in the project. This script automates the process of creating a `.dmg` file for easy distribution on macOS.
 
@@ -111,6 +120,35 @@ To create a macOS disk image for installing **SmartVisionAIApp**, you can use th
 
 4. **Find the Disk Image**
    After the script finishes, you will find the `.dmg` file in the root project directory. You can now use it for installation on macOS.
+
+### Creating a Windows Executable for Installation
+
+To create a standalone executable for Windows, follow these steps:
+
+1. **Transfer Project to a Windows Environment**:
+   Since PyInstaller builds are platform-specific, run the following steps on a Windows system or virtual machine.
+
+2. **Install Python and Dependencies on Windows**:
+   - Install Python and ensure it’s added to your system path.
+   - In the root project folder, install the required dependencies:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+3. **Run the PyInstaller Command on Windows**:
+   Run the same PyInstaller command as above to create a Windows-compatible `.exe` file:
+   ```bash
+   pyinstaller --name "SmartVisionAI" --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico \
+       --add-data "data/openai_key.txt;data" \
+       --add-data "data/prompt_msg.txt;data" \
+       run_app.py
+   ```
+> [!NOTE]
+> On Windows, the `--add-data` paths should use a semicolon (`;`) instead of a colon (`:`).
+
+4. **Locate the Executable**:
+   After the build completes, you will find `SmartVisionAI.exe` in the `dist` directory. This `.exe` file contains all dependencies and can be distributed directly to Windows users. They can simply double-click the `.exe` to run the app without installing Python.
+
 ## License
 
 This project is licensed under the terms of the [LICENSE](./LICENSE).
