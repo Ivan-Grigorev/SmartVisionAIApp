@@ -6,7 +6,7 @@ from typing import Optional
 import requests
 import sys
 
-from data.path_manager import get_data_file_path
+from src.data.path_manager import get_data_file_path
 from src.services.logging_config import setup_logger
 
 # Initialize logger using the setup function

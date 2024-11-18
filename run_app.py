@@ -5,7 +5,7 @@ import threading
 import tkinter as tk
 from tkinter import filedialog, font, messagebox
 
-from data.path_manager import get_data_file_path
+from src.data.path_manager import get_data_file_path
 from src.csv_generator import CSVGenerator
 from src.image_describer import ImagesDescriber
 from src.services.logging_config import TextHandler, setup_logger

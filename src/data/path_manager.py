@@ -19,4 +19,4 @@ def get_data_file_path(filename):
         return os.path.join(sys._MEIPASS, 'data', filename)
     else:
         # When running directly from the source
-        return os.path.join('data', filename)
+        return os.path.join('src', 'data', filename)
