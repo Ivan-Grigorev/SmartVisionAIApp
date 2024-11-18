@@ -32,7 +32,6 @@ class SmartVisionAIApp:
         """
         self.root = root
         self.root.title("SmartVisionAI")  # Set the title of the main window
-        self.root.geometry("600x500")  # Set the size of the main window
 
         # Define default fonts for the application
         self.default_font = font.Font(family="Verdana", size=14)
@@ -56,6 +55,17 @@ class SmartVisionAIApp:
 
         This window opens with app starting and allow users to choose options.
         """
+        # Set the main window in the center of the screen
+        window_width = 600
+        window_height = 500
+
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = (screen_width // 2) - (window_width // 2)
+        y = (screen_height // 2) - (window_height // 2)
+
+        self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
         # Frame to hold the settings button at the top right
         top_frame = tk.Frame(self.root)
         top_frame.pack(side='top', fill='x', padx=10, pady=10)
