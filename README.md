@@ -42,10 +42,12 @@ SmartVisionAIApp is an image metadata processing tool that allows users to add d
 
 ```plaintext
 SmartVisionAIApp/
+├── .gitattributes                  # Git configuration for handling file attributes
+├── .gitignore                      # Specifies files and directories to be ignored by Git
+├── .pre-commit-config.yaml         # Configuration file for pre-commit hooks
+├── builddmg.sh                     # Script to create a disk image for installation
 ├── LICENSE                         # License information for the project
 ├── README.md                       # Project documentation
-├── builddmg.sh                     # Script to create a disk image for installation
-├── openai_key.txt                  # File storing the OpenAI API key for image descriptions
 ├── requirements.txt                # List of Python dependencies
 ├── run_app.py                      # Main script to launch the application
 └── src/
