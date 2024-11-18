@@ -140,10 +140,7 @@ To create a standalone executable for Windows, follow these steps:
 3. **Run the PyInstaller Command on Windows**:
    Run the same PyInstaller command as above to create a Windows-compatible `.exe` file:
    ```bash
-   pyinstaller --name "SmartVisionAI" --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico \
-       --add-data "src/data/openai_key.txt;data" \
-       --add-data "src/data/prompt_msg.txt;data" \
-       run_app.py
+   pyinstaller --name "SmartVisionAI" --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico --add-data "src/data/openai_key.txt;data" --add-data "src/data/prompt_msg.txt;data" run_app.py
    ```
 > [!NOTE]
 > On Windows, the `--add-data` paths should use a semicolon (`;`) instead of a colon (`:`).
