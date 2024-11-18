@@ -48,17 +48,17 @@ SmartVisionAIApp/
 ├── openai_key.txt                  # File storing the OpenAI API key for image descriptions
 ├── requirements.txt                # List of Python dependencies
 ├── run_app.py                      # Main script to launch the application
-├── data/
-│   ├── __init__.py                 # Marks the data directory as a package
-│   ├── path_manager.py             # Check and creates a path to data files
-│   ├── openai_key.txt              # Stores OpenAI API key
-│   └── prompt_msg.txt              # Stores the user's prompt message
 └── src/
     ├── __init__.py                 # Marks the src directory as a package
     ├── csv_generator.py            # Generates CSV files with image metadata
     ├── image_describer.py          # Adds metadata to images based on descriptions
     ├── app_icons/
     │   └── smartvisionaiapp.ico    # Icon for the application
+    ├── data/
+    │   ├── __init__.py             # Marks the data directory as a package
+    │   ├── path_manager.py         # Check and creates a path to data files
+    │   ├── openai_key.txt          # Stores OpenAI API key
+    │   └── prompt_msg.txt          # Stores the user's prompt message
     └── services/
         ├── __init__.py             # Marks the services directory as a package
         ├── chatgpt_responder.py    # Handles interactions with the GPT model
@@ -79,8 +79,8 @@ To distribute **SmartVisionAIApp** as a standalone executable, you can use **PyI
    To create an executable, run the following command in the root directory of the project:
    ```bash
    pyinstaller --name "SmartVisionAI" --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico \
-    --add-data "data/openai_key.txt:data" \
-    --add-data "data/prompt_msg.txt:data" \
+    --add-data "src/data/openai_key.txt:data" \
+    --add-data "src/data/prompt_msg.txt:data" \
     run_app.py
    ```
    Explanation of the options:
@@ -88,8 +88,8 @@ To distribute **SmartVisionAIApp** as a standalone executable, you can use **PyI
    - `--onefile`: Bundles the app into a single executable file.
    - `--windowed`: Disables the command line window (for GUI apps).
    - `--icon=src/app_icons/smartvisionaiapp.ico`: Adds an icon to the executable (ensure the icon path is correct).
-   - `--add-data "data/openai_key.txt:data"`: Includes openai_key.txt in the 'data' folder in the bundle.
-   - `--add-data "data/prompt_msg.txt:data"`: Includes prompt_msg.txt in the 'data' folder in the bundle.
+   - `--add-data "src/data/openai_key.txt:data"`: Includes openai_key.txt in the 'data' folder in the bundle.
+   - `--add-data "src/data/prompt_msg.txt:data"`: Includes prompt_msg.txt in the 'data' folder in the bundle.
 
 2. **Find the Executable**
    After running the command, the executable will be created in the `dist` directory within your project folder. You can now share or distribute this standalone executable.
@@ -139,8 +139,8 @@ To create a standalone executable for Windows, follow these steps:
    Run the same PyInstaller command as above to create a Windows-compatible `.exe` file:
    ```bash
    pyinstaller --name "SmartVisionAI" --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico \
-       --add-data "data/openai_key.txt;data" \
-       --add-data "data/prompt_msg.txt;data" \
+       --add-data "src/data/openai_key.txt;data" \
+       --add-data "src/data/prompt_msg.txt;data" \
        run_app.py
    ```
 > [!NOTE]
