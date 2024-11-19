@@ -34,8 +34,8 @@ class SmartVisionAIApp:
         self.root.title("SmartVisionAI")  # Set the title of the main window
 
         # Define default fonts for the application
-        self.default_font = font.Font(family="Verdana", size=14)
-        self.bold_font = font.Font(family="Verdana", size=16, weight="bold")
+        self.default_font = font.Font(family="Verdana")
+        self.bold_font = font.Font(family="Verdana", weight="bold")
 
         # Initialize variables to track the windows
         self.app_settings_window = None
@@ -56,7 +56,7 @@ class SmartVisionAIApp:
         This window opens with app starting and allow users to choose options.
         """
         # Set the main window in the center of the screen
-        window_width = 600
+        window_width = 450
         window_height = 500
 
         screen_width = self.root.winfo_screenwidth()
@@ -85,22 +85,22 @@ class SmartVisionAIApp:
         # Create "Add Metadata" button
         tk.Button(
             button_frame,
-            text="Add Metadata",
+            text='Add Metadata',
             font=self.bold_font,
             height=2,
             width=30,
             command=self._create_add_metadata_window,
-        ).pack(pady=10)
+        ).pack(pady=10, expand=True)
 
         # Create "Generate CSV" button
         tk.Button(
             button_frame,
-            text="Generate CSV",
+            text='Generate CSV',
             font=self.bold_font,
             height=2,
             width=30,
             command=self._create_generate_csv_window,
-        ).pack(pady=10)
+        ).pack(pady=10, expand=True)
 
     def _create_app_settings_window(self):
         """
@@ -117,7 +117,7 @@ class SmartVisionAIApp:
         ):
             self.app_settings_window = tk.Toplevel(self.root)
             self.app_settings_window.title(title)
-            self.app_settings_window.geometry('600x400')
+            self.app_settings_window.geometry('450x350')
 
             # Labels and entries for title and description
             tk.Label(
@@ -177,7 +177,7 @@ class SmartVisionAIApp:
         ):
             self.add_metadata_window = tk.Toplevel(self.root)
             self.add_metadata_window.title(title)
-            self.add_metadata_window.geometry('700x700')
+            self.add_metadata_window.geometry('550x650')
 
             # Labels and entries for title and description
             tk.Label(
@@ -288,7 +288,7 @@ class SmartVisionAIApp:
         ):
             self.generate_csv_window = tk.Toplevel(self.root)  # Create a new top-level window
             self.generate_csv_window.title(title)
-            self.generate_csv_window.geometry("700x600")
+            self.generate_csv_window.geometry("550x550")
 
             # Labels and entries for title and description
             tk.Label(
@@ -471,7 +471,7 @@ class SmartVisionAIApp:
         ):
             self.processing_status_window = tk.Toplevel(self.root)
             self.processing_status_window.title("Processing Status")
-            self.processing_status_window.geometry("1000x400")
+            self.processing_status_window.geometry("900x300")
 
             # Create a frame to hold the Text and Scrollbar
             frame = tk.Frame(self.processing_status_window)
@@ -496,8 +496,8 @@ class SmartVisionAIApp:
             # Configure tags for each log level
             for level, color in text_colors.items():
                 if level == 'CRITICAL':
-                    log_text.tag_configure(level, foreground=color, font=('Verdana', 14, 'bold'))
-                log_text.tag_configure(level, foreground=color)
+                    log_text.tag_configure(level, foreground=color, font=self.bold_font)
+                log_text.tag_configure(level, foreground=color, font=self.default_font)
 
             # Set up TextHandler for live logging in the Text widget
             text_handler = TextHandler(log_text)
