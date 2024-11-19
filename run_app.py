@@ -193,7 +193,7 @@ class SmartVisionAIApp:
 
             # Set window size proportional to the screen
             window_width = int(self.screen_width * 0.4)  # 40% of screen width
-            window_height = int(self.screen_height * 0.65)  # 65% of screen height
+            window_height = max(650, int(self.screen_height * 0.65))  # At least 650px or 65% of screen height
             self.add_metadata_window.geometry(f'{window_width}x{window_height}')
 
             # Labels and entries for title and description
@@ -308,7 +308,7 @@ class SmartVisionAIApp:
 
             # Set window size proportional to the screen
             window_width = int(self.screen_width * 0.4)  # 40% of screen width
-            window_height = int(self.screen_height * 0.6)  # 60% of screen height
+            window_height = max(600, int(self.screen_height * 0.6))  # At least 600px or 60% of screen height
             self.generate_csv_window.geometry(f"{window_width}x{window_height}")
 
             # Labels and entries for title and description
