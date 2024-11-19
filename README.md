@@ -80,10 +80,14 @@ To distribute **SmartVisionAIApp** as a standalone executable, you can use **PyI
 1. **Create the Executable**
    To create an executable, run the following command in the root directory of the project:
    ```bash
-   pyinstaller --name "SmartVisionAI" --onefile --windowed --icon=src/app_icons/smartvisionaiapp.ico \
-    --add-data "src/data/openai_key.txt:data" \
-    --add-data "src/data/prompt_msg.txt:data" \
-    run_app.py
+   pyinstaller \
+   --name "SmartVisionAI" \
+   --onefile \
+   --windowed \
+   --icon=src/app_icons/smartvisionaiapp.ico \
+   --add-data "src/data/openai_key.txt:data" \
+   --add-data "src/data/prompt_msg.txt:data" \
+   run_app.py
    ```
    Explanation of the options:
    - `--name "SmartVisionAI"`: Sets the name of the executable.
