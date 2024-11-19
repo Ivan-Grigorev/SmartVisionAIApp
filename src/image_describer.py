@@ -98,6 +98,9 @@ class ImagesDescriber:
             # Terminate processes using the image file
             terminate_processes_using_file(image_path)
 
+            # Track if image processing succeeds
+            successfully_processed = False
+
             try:
                 with open(image_path, 'rb') as image_file:
                     # Create a temporary copy of the image
@@ -142,21 +145,21 @@ class ImagesDescriber:
                         f"{'and moved to ' + os.path.dirname(destination_path) if destination_path != image_path else ''}"
                     )
                     processed_count += 1
+                    successfully_processed = True
 
             except Exception as e:
                 logger.error(f"Error adding metadata to {image_name}: {e}")
             finally:
-                # Remove the original file only if the edited copy
-                # has been moved to another folder
-                if image_path != destination_path:
-                    os.remove(image_path)
-
                 # Ensure backup files are removed regardless of success or failure
                 self.remove_backup_file(destination_path)
 
                 # Clean up temp file if it exists and is not needed
                 if temp_image_path and os.path.exists(temp_image_path):
                     os.remove(temp_image_path)
+
+            # Remove the original file only if successfully processed and moved
+            if successfully_processed and image_path != destination_path:
+                os.remove(image_path)
 
         # Calculate the number of unprocessed images
         unprocessed_count = len(filtered_image_files) - processed_count
