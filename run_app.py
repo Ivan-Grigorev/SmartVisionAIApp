@@ -3,6 +3,7 @@
 import logging
 import threading
 import tkinter as tk
+from datetime import datetime
 from tkinter import filedialog, font, messagebox
 
 from src.csv_generator import CSVGenerator
@@ -155,6 +156,14 @@ class SmartVisionAIApp:
             ).pack(pady=(10, 0))
             self.openai_key_entry.pack(pady=10)
 
+            # Display last OpenAI API key info
+            last_updated = self.get_openai_key_date()
+            tk.Label(
+                self.app_settings_window,
+                text=last_updated,
+                font=font.Font(family='Verdana', size=10, slant='italic'),
+            ).pack()
+
             # Save button
             tk.Button(
                 self.app_settings_window,
@@ -193,7 +202,9 @@ class SmartVisionAIApp:
 
             # Set window size proportional to the screen
             window_width = int(self.screen_width * 0.4)  # 40% of screen width
-            window_height = max(650, int(self.screen_height * 0.65))  # At least 650px or 65% of screen height
+            window_height = max(
+                650, int(self.screen_height * 0.65)
+            )  # At least 650px or 65% of screen height
             self.add_metadata_window.geometry(f'{window_width}x{window_height}')
 
             # Labels and entries for title and description
@@ -308,7 +319,9 @@ class SmartVisionAIApp:
 
             # Set window size proportional to the screen
             window_width = int(self.screen_width * 0.4)  # 40% of screen width
-            window_height = max(600, int(self.screen_height * 0.6))  # At least 600px or 60% of screen height
+            window_height = max(
+                600, int(self.screen_height * 0.6)
+            )  # At least 600px or 60% of screen height
             self.generate_csv_window.geometry(f"{window_width}x{window_height}")
 
             # Labels and entries for title and description
@@ -405,6 +418,25 @@ class SmartVisionAIApp:
         except Exception as e:
             logger.error(f"Unexpected error occurred: {e}")
 
+    def get_openai_key_date(self):
+        """
+        Load the last saved OpenAI API Key from openai_key.txt file and display the generated data.
+
+        Returns:
+            str: A message indicating the last update date or a default message if no data available.
+
+        Raises:
+            Exception: Logs an error if an unexpected exception occurs during the file read process.
+        """
+        try:
+            with open(get_data_file_path('openai_key.txt'), 'r') as file:
+                line = file.read()
+                date = line.split('; ')[0]
+                date_info = f"Last updated OpenAI API Key from {date}"
+                return date_info if line else 'No OpenAI API Key available'
+        except Exception as e:
+            logger.error(f"Unexpected error occurred: {e}")
+
     def save_app_settings(self):
         """
         Save the SmartVisionAI app configuration settings.
@@ -416,10 +448,14 @@ class SmartVisionAIApp:
         if not openai_key:
             messagebox.showerror("Error", "OpenAI API Key is required")
 
-        else:
+        try:
             with open(get_data_file_path('openai_key.txt'), 'w') as openai_file:
-                openai_file.write(openai_key)
+                date = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+                openai_key_record = f"{date}; {openai_key}"
+                openai_file.write(openai_key_record)
             self.app_settings_window.destroy()
+        except Exception as e:
+            logger.error(f"Unexpected error occurred: {e}")
 
     def select_src_folder(self):
         """
