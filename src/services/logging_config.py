@@ -5,6 +5,9 @@ import tkinter as tk
 
 from colorlog import ColoredFormatter
 
+# Suppress INFO and WARNING from iptcinfo3
+logging.getLogger('iptcinfo').setLevel(logging.ERROR)
+
 # Define colors for different log levels
 log_colors = {
     'DEBUG': 'white',
@@ -16,7 +19,7 @@ log_colors = {
 
 # Custom formatter with colored output
 detailed_formatter = ColoredFormatter(
-    '%(log_color)s%(asctime)s - %(levelname)s - %(message)s',
+    '%(module)s.%(funcName)s:%(lineno)d >>> %(log_color)s%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%d/%m/%Y %H:%M:%S',
     log_colors=log_colors,
 )
@@ -34,14 +37,13 @@ def setup_logger(logger_name):
         logging.Logger: The configured logger instance.
     """
     logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.INFO)
 
-    if logger_name != 'root':
+    if logger_name == 'root':
         # Stream handler for console
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(detailed_formatter)
         logger.addHandler(stream_handler)
-
-    logger.setLevel(logging.INFO)
 
     return logger
 
