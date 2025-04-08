@@ -36,6 +36,10 @@ def process_photo(image_file, prompt, image_caption: Optional[str] = None):
         )
         # Exit the program with a status code 1
         sys.exit(1)
+    except Exception:
+        logger.critical("Error occurred while reading the OpenAI API Key.")
+        # Exit the program with a status code 1
+        sys.exit(1)
 
     # Convert the image to a based64 string
     image_base64 = base64.b64encode(image_file.read()).decode('ascii')
