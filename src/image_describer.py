@@ -10,6 +10,7 @@ from iptcinfo3 import IPTCInfo
 
 from src.services.check_access import terminate_processes_using_file
 from src.services.files_filter import filter_files_by_extension
+from src.services.img_metadata_reader import get_metadata
 from src.services.logging_config import setup_logger
 from src.services.process_timer import execution_timer
 from src.services.response_parser import parse_response
@@ -22,16 +23,7 @@ class ImagesDescriber:
     """
     A class to facilitate image description generation using OpenAI's GPT model and add metadata to images.
 
-    Attributes:
-        prompt (str): The prompt to be sent to the GPT model for generating descriptions.
-        src_path (str): The source directory containing the images to be processed.
-        dst_path (str): The destination directory for saving the processed images. If not provided, defaults to src_path.
-        author_name (str): The author name of the images.
-
     Methods:
-        __init__(prompt, src_path, dst_path, author_name):
-            Initializes the ImagesDescriber with the specified parameters.
-
         add_metadata():
             Adds processed titles, descriptions, and keywords to the metadata of the images in the source directory.
             Saves the processed images in the destination directory.
@@ -48,7 +40,7 @@ class ImagesDescriber:
         """
         Initialize the ImagesDescriber with a prompt, source path, destination path, and author name.
 
-        Args:
+        Attributes:
             prompt (str): The prompt to be sent to the GPT model for generating descriptions.
             src_path (str): The path to the directory containing the images to be processed.
             dst_path (str): The path to the directory where processed images will be saved. Defaults to src_path if not provided.
@@ -116,10 +108,10 @@ class ImagesDescriber:
                         info = IPTCInfo(None)
 
                     # Get image caption from image metadata
-                    image_caption = info['caption/abstract']
+                    image_caption = get_metadata(temp_image_path)
                     if not image_caption:
                         logger.warning(
-                            f"The file '{image_name}' does not contain IPTC metadata. "
+                            f"The file '{image_name}' does not contain metadata. "
                             "Title, description, and keywords will be generated "
                             "without using the image caption."
                         )

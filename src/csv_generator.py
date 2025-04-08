@@ -6,8 +6,7 @@ import sys
 import time
 from datetime import datetime
 
-from iptcinfo3 import IPTCInfo
-
+from src.services.img_metadata_reader import get_metadata
 from src.services.files_filter import filter_files_by_extension
 from src.services.logging_config import setup_logger
 from src.services.process_timer import execution_timer
@@ -19,17 +18,10 @@ logger = setup_logger(__name__)
 
 class CSVGenerator:
     """
-    A class to generate image descriptions using OpenAI's GPT model based on extracted captions from image metadata, then save the results to a CSV file.
-
-    Attributes:
-        prompt (str): The prompt to be sent to the GPT model for generating descriptions.
-        src_path (str): The source directory containing the images to be processed.
-        dst_path (str): The destination directory for saving the generated CSV file. If not provided, defaults to src_path.
+    A class to generate image descriptions using OpenAI's GPT model based on extracted captions from image metadata,
+    then save the results to a CSV file.
 
     Methods:
-        __init__(prompt, src_path, dst_path):
-            Initializes the CSVGenerator with the specified parameters.
-
         write_data_to_csv():
             Generates a CSV file containing the file names, titles, descriptions, and keywords of the processed images.
             Saves the CSV file in the destination directory.
@@ -38,14 +30,15 @@ class CSVGenerator:
             Returns a string representation of the CSVGenerator instance.
     """
 
-    def __init__(self, prompt, src_path, dst_path):
+    def __init__(self, prompt, src_path, dst_path=None):
         """
-        Initialize the CSVGenerator with a prompt, source path, and destination path.
+        Initialize the CSVGenerator with a prompt, source path, and optionally a destination path.
 
-        Args:
+        Attributes:
             prompt (str): The prompt to be sent to the GPT model for generating descriptions.
             src_path (str): The path to the directory containing the images to be processed.
-            dst_path (str): The path to the directory where the generated CSV file will be saved. Defaults to src_path if not provided.
+            dst_path (str, optional): The path to the directory where the generated CSV file will be saved.
+                                      Defaults to src_path if not provided.
         """
         self.prompt = prompt
         self.src_path = src_path
@@ -96,20 +89,11 @@ class CSVGenerator:
 
                     try:
                         with open(image_path, 'rb') as image_file:
-                            # Load IPTC metadata
-                            try:
-                                info = IPTCInfo(image_path)
-                            except Exception as e:
-                                logger.error(
-                                    f"No IPTC metadata found, create a new one. Error: {e}"
-                                )
-                                info = IPTCInfo(None)
-
                             # Get image caption from image metadata
-                            image_caption = info['caption/abstract']
+                            image_caption = get_metadata(image_path)
                             if not image_caption:
                                 logger.warning(
-                                    f"The file '{image_name}' does not contain IPTC metadata. "
+                                    f"The file '{image_name}' does not contain metadata. "
                                     "Title, description, and keywords will be generated "
                                     "without using the image caption."
                                 )
