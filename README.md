@@ -23,10 +23,35 @@ SmartVisionAIApp is an image metadata processing tool that allows users to add d
    pip install -r requirements.txt
    ```
 
-3. **Add OpenAI API Key**
-   Place your OpenAI API key in a file named `openai_key.txt` in the root directory of the project. This key is essential for accessing GPT model capabilities to describe images. **Note**: Be aware of OpenAI’s request limits and usage quotas, as frequent or large requests can quickly exhaust your rate limits and may incur costs.
+3. **Install `exiftool`**
+   SmartVisionAIApp uses [`exiftool`](https://exiftool.org/) to read and write image metadata. Please install it based on your operating system:
 
-4. **Run the Application**
+   - **macOS** (with Homebrew):
+     ```bash
+     brew install exiftool
+     ```
+
+   - **Ubuntu/Linux**:
+     ```bash
+     sudo apt-get install libimage-exiftool-perl
+     ```
+
+   - **Windows**:
+     Download the Windows executable from: [https://exiftool.org/](https://exiftool.org/)  
+     Extract and rename the `.exe` file to `exiftool.exe`, and add its directory to your system's PATH.
+
+> [!TIP]
+> After installation, verify that `exiftool` is accessible by running:
+> ```bash
+> exiftool -ver
+> ```
+
+4. **Add OpenAI API Key**
+   Set your OpenAI API key in the app settings located in the top right corner of the main window. This key is essential for accessing GPT model capabilities to describe images. 
+> [!Note]
+> Be aware of OpenAI’s request limits and usage quotas, as frequent or large requests can quickly exhaust your rate limits and may incur costs.
+
+5. **Run the Application**
    To start the application, execute:
    ```bash
    python run_app.py
@@ -34,9 +59,17 @@ SmartVisionAIApp is an image metadata processing tool that allows users to add d
 
 ## Usage
 
-- **Adding Metadata to Images**: Select the "Add Metadata" option to automatically add descriptive metadata to images in a specified folder.
-- **Generating a CSV File**: Choose "Generate CSV" to create a CSV with image metadata, which will be saved in the destination folder.
-- **Setting Source and Destination Folders**: Both options allow for selecting source and destination folders, with prompts for custom descriptions and optional author attribution.
+- **Adding Metadata to Images**:  
+  Select the "Add Metadata" option to automatically add descriptive metadata to images in a specified folder. This operation uses `exiftool` under the hood to embed metadata (Title, Description, Keywords) into each image file in-place.
+
+- **Generating a CSV File**:  
+  Choose "Generate CSV" to create a CSV with image metadata, which will be saved in the destination folder. Metadata is extracted using `exiftool` (EXIF, IPTC, and XMP standards are supported) and exported into structured CSV format.
+
+- **Setting Source and Destination Folders**:  
+  Both options allow for selecting source and destination folders, with prompts for custom descriptions and optional author attribution.
+
+> [!NOTE]
+> The app detects missing `exiftool` or lack of access rights and prompts the user to check installation or file permissions.
 
 ## Project Structure
 
@@ -66,6 +99,7 @@ SmartVisionAIApp/
         ├── chatgpt_responder.py    # Handles interactions with the GPT model
         ├── check_access.py         # Verifies permissions and file access
         ├── files_filter.py         # Filters and validates image files in a directory
+        ├── img_metadata_reader.py  # Reads existing image metadata (EXIF, IPTC, XMP)
         ├── logging_config.py       # Configures logging for the application
         ├── process_timer.py        # Displays processing time
         └── response_parser.py      # Parses and structures responses from the GPT model
